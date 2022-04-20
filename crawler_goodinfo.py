@@ -15,5 +15,17 @@ res.encoding = 'utf-8'
 soup = BeautifulSoup(res.text, 'html.parser')
 
 table = soup.select("table tr")
-print(table)
+
+dict = {}
+for item in table:
+    content = item.text.split("\n")[1:-1]
+    dict[content[0]] = content[1:]
+
+df = pd.DataFrame(dict)
+df[['稅後淨利率','總資產週轉','ROE']] = df[['稅後淨利率','總資產週轉','ROE']].astype(float)
+
+df["財務槓桿"] = df.apply(lambda x:((x['ROE']/x['總資產週轉'])/x['稅後淨利率']),axis=1)
+print(df)
+
+df.to_csv("dupont_analysis_data.csv")
 
